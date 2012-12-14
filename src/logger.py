@@ -7,8 +7,8 @@ import re
 import general_func
 import logging
 
-log_main_dir = re.search('(.*bucpp).*', os.getcwd()).group(1) + os.sep + "log"
-log_main_file = log_main_dir + os.sep + "bucpp.log"
+log_main_dir = re.search('(.*leechB).*', os.getcwd()).group(1) + os.sep + "log"
+log_main_file = log_main_dir + os.sep + "leechB.log"
 log_prj_dir = log_main_dir + os.sep + "prjlogs"
 
 class main_log(object):
@@ -16,7 +16,7 @@ class main_log(object):
         general_func.dir_crt(log_main_dir)
         general_func.dir_crt(log_prj_dir)
         general_func.file_crt(log_main_file)
-        self.logger = logging.getLogger("bucpp")
+        self.logger = logging.getLogger("leechB")
         self.filehd = logging.FileHandler(log_main_file, "a+")
         self.streamhd = logging.StreamHandler()
         self.logger.setLevel("DEBUG")     # 全局logger的level要低，下面不同handler才有效，否则以全局为主。
