@@ -6,12 +6,10 @@ import os
 import logger
 import re
 
-
-
 class backup(object):
     def __init__(self, prj_name, items):
-        self.snap_log = logger.prj_log(prj_name)
-        self.snap_log.mainlog()
+        self.snap_ctllog_instance = logger.snap_ctl_log(prj_name)
+        self.snap_ctllog_instance.mainlog()
         
         self.prj_name = prj_name
         self.prj_src = items[0][1]
@@ -21,9 +19,9 @@ class backup(object):
         self.src_father_df = os.sep
         for mid_dir in self.prj_src.split("/")[1:-1]:
             self.src_father_df += mid_dir + os.sep
-        
+
     def __prj_snap_base_read(self):
-        log_fh = open(logger.log_prj_dir + os.sep + self.prj_name)
+        log_fh = open(logger.prj_cfg_dir + os.sep + self.prj_name)
         try:
             snap_base = int([x for x in log_fh][-1].strip().split()[-1])
         except IndexError: #文件为空，则做第一次备份，base为-1 这样每次snap都是+1,则next是0
@@ -43,8 +41,8 @@ class backup(object):
         self.src_df = str(self.prj_src.split("/")[-1])
 
         os.system("tar -g" + " " + dst_stamp + " " + "-zcf" + dst_filename + " " + self.src_df)
-        self.snap_log.logger.info(msg + " " + str(snap_next))
-        
+        self.snap_ctllog_instance.logger.info(msg + " " + str(snap_next))
+
         os.chdir(self.work_dir)
 
     def snap_delete(self, snap_num):
@@ -55,7 +53,7 @@ class backup(object):
 
         if snap_num <= snap_base: #基本条件 如果没有这个snap则不运行
 
-            log_fh = open(logger.log_prj_dir + os.sep + self.prj_name, "r") #这里已经下面的for循环为找到给出的snap的行数
+            log_fh = open(logger.prj_cfg_dir + os.sep + self.prj_name, "r") #这里已经下面的for循环为找到给出的snap的行数
             self.line_num = 0
             for x in log_fh: #循环一次行数 + 1, 之后读取全部行数
                 aaa = re.search(" " + str(snap_num) + os.linesep, x)
@@ -70,19 +68,19 @@ class backup(object):
                     log_fh.close()
                     break   # 匹配之后文件句柄已经关闭，所以循环也退出
             #根据上面的log行数 读取snap的log确认需要删除的列表
-            log_fh = open(logger.log_prj_dir + os.sep + self.prj_name, "r")
+            log_fh = open(logger.prj_cfg_dir + os.sep + self.prj_name, "r")
             all_file_list = [line for line in log_fh]
             delete_list = all_file_list[self.line_num - 1:]
             for del_item in delete_list:
                 all_file_list.remove(del_item)
             log_fh.close()
-            
+
             #覆盖上面已经确定的列表，写入文件
-            log_fh = open(logger.log_prj_dir + os.sep + self.prj_name, "w")
+            log_fh = open(logger.prj_cfg_dir + os.sep + self.prj_name, "w")
             for good_line in all_file_list:
                 log_fh.write(good_line)
             log_fh.close()
-            
+
             #开始删除备份文件和备份时间戳记
             for i in range(snap_num, snap_base + 1):
                 try:
@@ -106,7 +104,7 @@ class backup(object):
 
     def __df_del(self, df_name):
         '''递归删除文件夹。df_name及其下属文件，文件夹删除。
-        注意这里只定义了两种文件形势，其余例如link不会被删除'''
+        注意这里只定义了两种文件，其余例如link不会被删除'''
         if os.path.isfile(df_name):
             os.remove(df_name)
         elif os.path.isdir(df_name):
@@ -131,19 +129,54 @@ class backup(object):
                       " -C " + 
                       self.src_father_df)
 
+    def snap_list(self):
+        log_read_hd = open(logger.prj_cfg_dir + os.sep + self.prj_name, 'r')
+        print "==========snapshot list=========="
+        print "PrjName: %s" % self.prj_name
+        line_cmp = re.compile('^(\[.*\]).*\)\s(.*)\s([0-9]+)$')
+        for line in log_read_hd:
+            temp = line.rstrip()
+            result = re.search(line_cmp, temp)
+            print "SnapNum: %s\tSnapTime: %s\tSummary: %s" % (result.group(3), result.group(1), result.group(2))
+        
+    def snap_revert_to(self, snap_num, dst_lct):
+        for num in range(0,snap_num+1): # 批量解压到源文件来还原
+            os.system("tar -zxvf " + 
+                      self.prj_dst + 
+                      os.sep + 
+                      self.prj_name + 
+                      "_" + 
+                      str(num) + 
+                      ".tar.gz" + 
+                      " -C " + 
+                      dst_lct)
+
+    def test(self, df_name):
+        '''递归删除文件夹。df_name及其下属文件，文件夹删除。
+        注意这里只定义了两种文件，其余例如link不会被删除'''
+        if os.path.isfile(df_name):
+            os.remove(df_name)
+        elif os.path.isdir(df_name):
+            for item in os.listdir(df_name):
+                df_name_item = os.path.join(df_name, item)
+                self.__df_del(df_name_item)
+                try:
+                    os.rmdir(df_name)
+                except:
+                    pass
 
 #aaa = backup("aaa", [("prj_src", "/home/lucifer/test"), ("prj_dst", "/tmp")])
-
-#aaa.df_del("/home/lucifer/test")
+#aaa.test("/home/lucifer/test")
 #aaa.snap_revert(0)
 #print aaa.prj_name
 #print aaa.prj_src
 #print aaa.prj_dst
-#aaa.snap_create("22222")
+#aaa.snap_create("less tha as as asd")
 #aaa.snap_delete(0)
 #aaa.snap_rebase()
 #aaa.test(5)
 #print aaa.work_dir
 #print aaa.test()
+#aaa.snap_list()
 
 

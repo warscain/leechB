@@ -1,0 +1,91 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 *-*
+# leechB_bck
+# 1 dst dir： 暂放
+# 3 -l comments不完整BUG，有空格不行 重要。完成-t之后做
+#   -l 显示log里的时间
+
+from optparse import OptionParser
+import sys
+from src import backup
+from src import prj_cfg_mng
+
+
+MSG_USAGE = "\nEXAMPLE:\n\
+            leechB_bck -P prj_name -c -m 'comments you want'\n\
+            leechB_bck -P prj_name -d\n\
+            leechB_bck -P prj_name -d\n\
+            leechB_bck -P prj_name -l"
+
+cmdhelp = OptionParser(MSG_USAGE)
+
+cmdhelp.add_option('-P', '--project', action='store', dest='project', help='input project name')
+cmdhelp.add_option('-c', '--create', action='store_true', help='create')
+cmdhelp.add_option('-m', '--comment', action='store', dest='comment', help='comment')
+cmdhelp.add_option('-d', '--delete', action='store', dest='delete', type='int', help='delete')
+cmdhelp.add_option('-r', '--revert', action='store', dest='revert', type='int', help='revert')
+cmdhelp.add_option('-i', '--rebase', action='store_true', help='rebase')
+cmdhelp.add_option('-l', '--bcklist', action='store_true', help='bcklist')
+cmdhelp.add_option('-t', '--revert-to', action='store', dest='revertto',type='int', help='revert to somewhere. this use with -D xxx')
+cmdhelp.add_option('-D', '--destination', action='store', dest='destination', help='location you want to revert to')
+
+
+(input_opts, args) = cmdhelp.parse_args(sys.argv[1:])
+prj_instance = prj_cfg_mng.prj_cfg()
+
+# bck create
+if input_opts.project and input_opts.create and input_opts.comment:
+    prj_read = prj_instance.prjcfg_read(input_opts.project)
+    bck_instance = backup.backup(input_opts.project, prj_read)
+    bck_instance.snap_create(input_opts.comment)
+
+# bck delete
+elif input_opts.project and input_opts.delete != None: #这里注意，因为revert可以为0 则input_opts.delete不为真
+    prj_read = prj_instance.prjcfg_read(input_opts.project)
+    bck_instance = backup.backup(input_opts.project, prj_read)
+    bck_instance.snap_delete(input_opts.delete)
+
+# bck revert
+elif input_opts.project and input_opts.revert != None: #这里注意，因为revert可以为0 则input_opts.revert不为真
+    print input_opts
+    prj_read = prj_instance.prjcfg_read(input_opts.project)
+    bck_instance = backup.backup(input_opts.project, prj_read)
+    bck_instance.snap_revert(input_opts.revert)
+
+# bck rebase
+elif input_opts.project and input_opts.rebase:
+    prj_read = prj_instance.prjcfg_read(input_opts.project)
+    bck_instance = backup.backup(input_opts.project, prj_read)
+    bck_instance.snap_rebase()
+
+# bck bcklist
+elif input_opts.project and input_opts.bcklist:
+    prj_read = prj_instance.prjcfg_read(input_opts.project)
+    bck_instance = backup.backup(input_opts.project, prj_read)
+    bck_instance.snap_list()
+
+# bck revert to
+elif input_opts.project and input_opts.revertto != None and input_opts.destination:
+    prj_read = prj_instance.prjcfg_read(input_opts.project)
+    bck_instance = backup.backup(input_opts.project, prj_read)
+    bck_instance.snap_revert_to(input_opts.revertto, input_opts.destination)
+
+else:
+    print 'Wrong way to use, pls get help from "-h"'
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

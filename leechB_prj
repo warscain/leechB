@@ -1,0 +1,78 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 *-*
+# leechB_prj
+
+from optparse import OptionParser
+import sys
+from src import prj_cfg_mng
+
+
+MSG_USAGE = "\nEXAMPLE:\n\
+            leechB_prj -P prj_name -c -S /home/lucifer -D /backup\n\
+            leechB_prj -P prj_name -e [-S /home/lucifer] [-D /var/backup]\n\
+            leechB_prj -P prj_name -d\n\
+            leechB_prj -P prj_name -r\n\
+            leechB_prj -l"
+
+cmdhelp = OptionParser(MSG_USAGE)
+
+cmdhelp.add_option('-P', '--project', action='store', dest='project', help='input project name')
+cmdhelp.add_option('-c', '--create', action='store_true', help='create')
+cmdhelp.add_option('-e', '--edit', action='store_true', help='edit')
+cmdhelp.add_option('-d', '--delete', action='store_true', help='delete')
+cmdhelp.add_option('-r', '--read', action='store_true', help='read')
+cmdhelp.add_option('-l', '--prjlist', action='store_true', help='list')
+cmdhelp.add_option('-S', '--source', action='store', dest='source', help='project source')
+cmdhelp.add_option('-D', '--destination', action='store', dest='destination', help='project destination')
+
+(input_opts, args) = cmdhelp.parse_args(sys.argv[1:])
+prj_instance = prj_cfg_mng.prj_cfg()
+
+# prj list
+if input_opts.prjlist \
+        and not input_opts.project \
+        and not input_opts.create \
+        and not input_opts.edit \
+        and not input_opts.delete \
+        and not input_opts.read:
+    prj_instance.prjcfg_list()
+
+# prj create
+elif (input_opts.project and input_opts.create) and (input_opts.source and input_opts.destination) \
+        and not input_opts.prjlist \
+        and not input_opts.edit \
+        and not input_opts.delete \
+        and not input_opts.read:
+    if prj_instance.prjcfg_create(input_opts.project):
+        prj_instance.prjcfg_edit(input_opts.project, [('prj_src',input_opts.source), ('prj_dst',input_opts.destination)])
+
+# prj edit
+elif (input_opts.project and input_opts.edit) and (input_opts.source or input_opts.destination) \
+        and not input_opts.prjlist \
+        and not input_opts.create \
+        and not input_opts.delete \
+        and not input_opts.read:
+    if input_opts.source and not input_opts.destination:
+        prj_instance.prjcfg_edit(input_opts.project, [('prj_src',input_opts.source)])
+    elif input_opts.destination and not input_opts.source:
+        prj_instance.prjcfg_edit(input_opts.project, [('prj_dst',input_opts.destination)])
+    else:
+        prj_instance.prjcfg_edit(input_opts.project, [('prj_src',input_opts.source), ('prj_dst',input_opts.destination)])
+
+#prj delete
+elif input_opts.project and input_opts.delete \
+        and not input_opts.create \
+        and not input_opts.edit \
+        and not input_opts.read:
+    prj_instance.prjcfg_delete(input_opts.project)
+
+# prj read
+elif input_opts.project and input_opts.read \
+        and not input_opts.prjlist \
+        and not input_opts.create \
+        and not input_opts.delete \
+        and not input_opts.edit:
+    prj_instance.prjcfg_read(input_opts.project)
+
+else:
+    print 'Wrong way to use, pls get help from "-h"'
