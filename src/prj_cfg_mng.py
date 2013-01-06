@@ -12,9 +12,7 @@ prj_main_dir = re.search('(.*leechB).*', os.getcwd()).group(1) + os.sep + "prj"
 prj_main_cfg = prj_main_dir + os.sep + "prj_cfg.cfg"
 prj_cfg_dir = prj_main_dir + os.sep + "projects"
 
-
 class prj_cfg_parse(object):
-    ''''''
     def __init__(self):
         # file/dir init
         general_func.dir_crt(prj_main_dir)
@@ -29,57 +27,54 @@ class prj_cfg_parse(object):
 
     def section_create(self, section):
         if self.cfg.has_section(section):
-            self.prj_mng_log.logger.error("Can't CREATE " + section + ":It's already exist")
-            print "Section exist"
+            self.prj_mng_log.logger.error("CREATE: " + "project: " + section + " Can't create project: It's already exist")
             return None
         else:
             self.cfg.add_section(section)
             self.cfg.write(open(prj_main_cfg, "w"))
-            self.prj_mng_log.logger.info("CREATE: " + section)
-            print "Project %s is Created" % section
-            return True
+            self.prj_mng_log.logger.info("CREATE: " + "project: " + section)
+            return section
 
     def _value_modify_single(self, section, option, value):
-        if option in ("prj_src", "prj_dst"):
+        if value:
             self.cfg.set(section, option, value)
             self.cfg.write(open(prj_main_cfg, "w"))
-            self.prj_mng_log.logger.info("MODIFY: " + section + " " + option)
-            print "%s: %s" % (option, value)
+            self.prj_mng_log.logger.info("MODIFY: " + "project: " + section + " " + option + ": " + value)
+            return (option, value)
         else:
-            self.prj_mng_log.logger.error("MODIFY: " + section + " " + option + " " + "is not legal")
+            return (option, self.cfg.get(section, option))
 
     def value_modify(self, section, items):
         if self.cfg.has_section(section):
+            result = []
             for (option, value) in items:
-                self._value_modify_single(section, option, value)
+                result.append(self._value_modify_single(section, option, value))
+            return result
         else:
-            self.prj_mng_log.logger.error("MODIFY: " + section + " " + "is not exist")
-            print "No such section: %s" % section
+            self.prj_mng_log.logger.error("MODIFY: " + "project: " + section + " Can't modify project: It's not exist")
+            return None
 
     def section_list(self):
-        self.sections = self.cfg.sections()
-        print "==========projects list=========="
-        for prj in self.sections:
-            print prj
+        self.prj_mng_log.logger.info("LIST: " + "project list")
+        return self.cfg.sections()
 
     def section_delete(self, section):
         if self.cfg.has_section(section):
             self.cfg.remove_section(section)
             self.cfg.write(open(prj_main_cfg, "w"))
-            self.prj_mng_log.logger.info("DELETE: " + section)
-            print "Project %s is Deleted" % section
+            self.prj_mng_log.logger.info("DELETE: " + "project: " + section)
+            return section
         else:
-            print "No such section"
+            self.prj_mng_log.logger.error("DELETE: " + "project: " + section + " Can't delete project: It's not exist")
+            return None
 
     def section_read(self, section):
         if self.cfg.has_section(section):
             result = self.cfg.items(section)
-            self.prj_mng_log.logger.info("READ: " + section)
-            print "%s: %s" % (result[0][0], result[0][1])
-            print "%s: %s" % (result[1][0], result[1][1])
+            self.prj_mng_log.logger.info("READ: " + "project: " + section)
+            return result
         else:
-            self.prj_mng_log.logger.error("READ: " + section + " " +  "is not exist")
-            print "No such section"
+            self.prj_mng_log.logger.error("READ: " + "project: " + section + " Can't read project: It's not exist")
             return None
 
 
@@ -88,20 +83,19 @@ class prj_cfg(object):
         self.cfg_parse = prj_cfg_parse()
 
     def prjcfg_create(self, prj_name):
-        if self.cfg_parse.section_create(prj_name):
-            return True
+        return self.cfg_parse.section_create(prj_name)
 
     def prjcfg_edit(self, prj_name, items):
-        self.cfg_parse.value_modify(prj_name, items)
+        return self.cfg_parse.value_modify(prj_name, items)
 
     def prjcfg_delete(self, prj_name):
-        self.cfg_parse.section_delete(prj_name)
+        return self.cfg_parse.section_delete(prj_name)
 
     def prjcfg_read(self, prj_name):
         return self.cfg_parse.section_read(prj_name)
 
     def prjcfg_list(self):
-        self.cfg_parse.section_list()
+        return self.cfg_parse.section_list()
 
 if __name__ == "__main__":
     pass
@@ -111,8 +105,8 @@ if __name__ == "__main__":
 #print aaa.prjcfg_create("noexffffifst")
 #aaa.prjcfg_create("sectionB")
 #aaa.prjcfg_create("sectionA")
-#aaa.prjcfg_edit("sectionB", [("prj_dst", 123123)])
-#aaa.prjcfg_edit("dfff", [("prj_src", 10000), ("prj_dst", 123123)])
+#print aaa.prjcfg_edit("a", [("prj_dst", 123123)])
+#print aaa.prjcfg_edit("a", [("prj_src", 10000), ("prj_dst", 123123)])
 #aaa.prjcfg_read("dddd")
 ##aaa.prjcfg_list()
 #aaa.prjcfg_delete("sectionA")

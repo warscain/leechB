@@ -29,9 +29,9 @@ cmdhelp.add_option('-l', '--bcklist', action='store_true', help='bcklist')
 cmdhelp.add_option('-t', '--revert-to', action='store', dest='revertto',type='int', help='revert to somewhere. this use with -D xxx')
 cmdhelp.add_option('-D', '--destination', action='store', dest='destination', help='location you want to revert to')
 
-
 (input_opts, args) = cmdhelp.parse_args(sys.argv[1:])
 prj_instance = prj_cfg_mng.prj_cfg()
+
 
 # bck create
 if input_opts.project and input_opts.create and input_opts.comment:
@@ -47,7 +47,6 @@ elif input_opts.project and input_opts.delete != None: #这里注意，因为rev
 
 # bck revert
 elif input_opts.project and input_opts.revert != None: #这里注意，因为revert可以为0 则input_opts.revert不为真
-    print input_opts
     prj_read = prj_instance.prjcfg_read(input_opts.project)
     bck_instance = backup.backup(input_opts.project, prj_read)
     bck_instance.snap_revert(input_opts.revert)

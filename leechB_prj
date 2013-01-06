@@ -28,51 +28,86 @@ cmdhelp.add_option('-D', '--destination', action='store', dest='destination', he
 (input_opts, args) = cmdhelp.parse_args(sys.argv[1:])
 prj_instance = prj_cfg_mng.prj_cfg()
 
+rul_list = input_opts.prjlist \
+            and not input_opts.project \
+            and not input_opts.create \
+            and not input_opts.edit \
+            and not input_opts.delete \
+            and not input_opts.read \
+            and not input_opts.source \
+            and not input_opts.destination
+
+rul_create = (input_opts.project and input_opts.create) and (input_opts.source and input_opts.destination) \
+            and not input_opts.edit \
+            and not input_opts.delete \
+            and not input_opts.read \
+            and not input_opts.prjlist
+
+rul_edit = (input_opts.project and input_opts.edit) and (input_opts.source or input_opts.destination) \
+            and not input_opts.create \
+            and not input_opts.delete \
+            and not input_opts.read \
+            and not input_opts.prjlist
+
+rul_delete = input_opts.project and input_opts.delete \
+            and not input_opts.create \
+            and not input_opts.edit \
+            and not input_opts.read \
+            and not input_opts.prjlist \
+            and not input_opts.source \
+            and not input_opts.destination
+
+rul_read = input_opts.project and input_opts.read \
+            and not input_opts.create \
+            and not input_opts.edit \
+            and not input_opts.delete \
+            and not input_opts.prjlist \
+            and not input_opts.source \
+            and not input_opts.destination
+
 # prj list
-if input_opts.prjlist \
-        and not input_opts.project \
-        and not input_opts.create \
-        and not input_opts.edit \
-        and not input_opts.delete \
-        and not input_opts.read:
-    prj_instance.prjcfg_list()
+if rul_list:
+    projects = prj_instance.prjcfg_list()
+    print "==========projects list=========="
+    for prj in projects:
+        print prj
 
 # prj create
-elif (input_opts.project and input_opts.create) and (input_opts.source and input_opts.destination) \
-        and not input_opts.prjlist \
-        and not input_opts.edit \
-        and not input_opts.delete \
-        and not input_opts.read:
+elif rul_create:
     if prj_instance.prjcfg_create(input_opts.project):
-        prj_instance.prjcfg_edit(input_opts.project, [('prj_src',input_opts.source), ('prj_dst',input_opts.destination)])
+        print "Project %s is Created" % input_opts.project
+        result = prj_instance.prjcfg_edit(input_opts.project, [('prj_src',input_opts.source), ('prj_dst',input_opts.destination)])
+        for item in result:
+            print "%s: %s" % (item[0], item[1])
+    else:
+        print "Project %s exist" % input_opts.project
 
 # prj edit
-elif (input_opts.project and input_opts.edit) and (input_opts.source or input_opts.destination) \
-        and not input_opts.prjlist \
-        and not input_opts.create \
-        and not input_opts.delete \
-        and not input_opts.read:
-    if input_opts.source and not input_opts.destination:
-        prj_instance.prjcfg_edit(input_opts.project, [('prj_src',input_opts.source)])
-    elif input_opts.destination and not input_opts.source:
-        prj_instance.prjcfg_edit(input_opts.project, [('prj_dst',input_opts.destination)])
-    else:
-        prj_instance.prjcfg_edit(input_opts.project, [('prj_src',input_opts.source), ('prj_dst',input_opts.destination)])
+elif rul_edit:
+        result = prj_instance.prjcfg_edit(input_opts.project, [('prj_src',input_opts.source), ('prj_dst',input_opts.destination)])
+        if result:
+            for item in result:
+                print "%s: %s" % (item[0], item[1])
+        else:
+            print "Project %s is not exist" % input_opts.project
 
 #prj delete
-elif input_opts.project and input_opts.delete \
-        and not input_opts.create \
-        and not input_opts.edit \
-        and not input_opts.read:
-    prj_instance.prjcfg_delete(input_opts.project)
+elif rul_delete:
+    if prj_instance.prjcfg_delete(input_opts.project):
+        print "Project %s is Deleted" % input_opts.project
+    else:
+        print "Project %s is Not Exist" % input_opts.project
 
 # prj read
-elif input_opts.project and input_opts.read \
-        and not input_opts.prjlist \
-        and not input_opts.create \
-        and not input_opts.delete \
-        and not input_opts.edit:
-    prj_instance.prjcfg_read(input_opts.project)
+elif rul_read:
+    result = prj_instance.prjcfg_read(input_opts.project)
+    if result:
+        print "%s: %s" % (result[0][0], result[0][1])
+        print "%s: %s" % (result[1][0], result[1][1])
+    else:
+        print "No such section"
 
+# cmd wrong
 else:
     print 'Wrong way to use, pls get help from "-h"'
+
