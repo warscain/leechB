@@ -14,18 +14,18 @@ MSG_USAGE = "\nEXAMPLE:\n\
             leechB_prj -P prj_name -r\n\
             leechB_prj -l"
 
-cmdhelp = OptionParser(MSG_USAGE)
+leechB_prj_cmd = OptionParser(MSG_USAGE)
 
-cmdhelp.add_option('-P', '--project', action='store', dest='project', help='input project name')
-cmdhelp.add_option('-c', '--create', action='store_true', help='create')
-cmdhelp.add_option('-e', '--edit', action='store_true', help='edit')
-cmdhelp.add_option('-d', '--delete', action='store_true', help='delete')
-cmdhelp.add_option('-r', '--read', action='store_true', help='read')
-cmdhelp.add_option('-l', '--prjlist', action='store_true', help='list')
-cmdhelp.add_option('-S', '--source', action='store', dest='source', help='project source')
-cmdhelp.add_option('-D', '--destination', action='store', dest='destination', help='project destination')
+leechB_prj_cmd.add_option('-P', '--project', action='store', dest='project', help='input project name')
+leechB_prj_cmd.add_option('-c', '--create', action='store_true', help='create')
+leechB_prj_cmd.add_option('-e', '--edit', action='store_true', help='edit')
+leechB_prj_cmd.add_option('-d', '--delete', action='store_true', help='delete')
+leechB_prj_cmd.add_option('-r', '--read', action='store_true', help='read')
+leechB_prj_cmd.add_option('-l', '--prjlist', action='store_true', help='list')
+leechB_prj_cmd.add_option('-S', '--source', action='store', dest='source', help='project source')
+leechB_prj_cmd.add_option('-D', '--destination', action='store', dest='destination', help='project destination')
 
-(input_opts, args) = cmdhelp.parse_args(sys.argv[1:])
+(input_opts, args) = leechB_prj_cmd.parse_args(sys.argv[1:])
 prj_instance = prj_cfg_mng.prj_cfg()
 
 rul_list = input_opts.prjlist \
@@ -109,5 +109,5 @@ elif rul_read:
 
 # cmd wrong
 else:
-    print 'Wrong way to use, pls get help from "-h"'
+    leechB_prj_cmd.error('Wrong way to use, pls get help from "-h"')
 
