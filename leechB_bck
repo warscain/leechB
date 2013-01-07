@@ -72,19 +72,3 @@ elif input_opts.project and input_opts.revertto != None and input_opts.destinati
 else:
     print 'Wrong way to use, pls get help from "-h"'
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

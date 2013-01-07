@@ -27,44 +27,7 @@ class main_log(object):
 
     def mainlog(self):
         fmt = {"filehd_fmt":
-               '[%(asctime)s] %(process)d %(levelname)-8s \
-                (%(module)s:%(lineno)d) %(message)s',
-
-                "streamhd_fmt":
-                '%(asctime)s|%(levelname)-6s|%(message)s'}
-
-        datefmt = '%H:%M:%S'
-
-        file_fmt = logging.Formatter(fmt["filehd_fmt"], datefmt)
-        self.filehd.setFormatter(file_fmt)
-        self.logger.addHandler(self.filehd)
-        self.filehd.setLevel("DEBUG")
-
-        stream_fmt = logging.Formatter(fmt["streamhd_fmt"], datefmt)
-        self.streamhd.setFormatter(stream_fmt)
-        self.logger.addHandler(self.streamhd)
-        self.streamhd.setLevel("ERROR")
-
-
-class prj_log(object):
-    def __init__(self, prj_name):
-        general_func.dir_crt(log_main_dir)
-        general_func.dir_crt(log_prj_dir)
-        general_func.file_crt(log_main_file)
-
-        self.logger = logging.getLogger("prj_log")
-
-        log_prj_file = log_prj_dir + os.sep + prj_name
-        general_func.file_crt(log_prj_file)
-        self.filehd = logging.FileHandler(log_prj_file, "a+")
-
-        self.streamhd = logging.StreamHandler()
-        self.logger.setLevel("DEBUG")     # 全局logger的level要低，下面不同handler才有效，否则以全局为主。
-
-    def mainlog(self):
-        fmt = {"filehd_fmt":
-               '[%(asctime)s] %(process)d %(levelname)-8s \
-                (%(module)s:%(lineno)d) %(message)s',
+               '[%(asctime)s] %(process)d %(levelname)-8s (%(module)s:%(lineno)d) %(message)s',
 
                 "streamhd_fmt":
                 '%(asctime)s|%(levelname)-6s|%(message)s'}
@@ -99,8 +62,7 @@ class snap_ctl_log(object):
 
     def mainlog(self):
         fmt = {"filehd_fmt":
-               '[%(asctime)s] %(process)d %(levelname)-8s \
-                (%(module)s:%(lineno)d) %(message)s',
+               '[%(asctime)s] %(process)d (%(module)s:%(lineno)d) %(message)s',
 
                 "streamhd_fmt":
                 '%(asctime)s|%(levelname)-6s|%(message)s'}

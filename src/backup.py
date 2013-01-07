@@ -10,7 +10,7 @@ class backup(object):
     def __init__(self, prj_name, items):
         self.snap_ctllog_instance = logger.snap_ctl_log(prj_name)
         self.snap_ctllog_instance.mainlog()
-        
+
         self.prj_name = prj_name
         self.prj_src = items[0][1]
         self.prj_dst = items[1][1]
@@ -40,7 +40,7 @@ class backup(object):
         os.chdir(self.src_father_df)
         self.src_df = str(self.prj_src.split("/")[-1])
 
-        os.system("tar -g" + " " + dst_stamp + " " + "-zcf" + dst_filename + " " + self.src_df)
+        os.system("tar -g" + " " + dst_stamp + " " + "-zcvf" + dst_filename + " " + self.src_df)
         self.snap_ctllog_instance.logger.info(msg + " " + str(snap_next))
 
         os.chdir(self.work_dir)
