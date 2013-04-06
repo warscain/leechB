@@ -165,13 +165,13 @@ class backup(object):
                 except:
                     pass
 
-#aaa = backup("aaa", [("prj_src", "/home/lucifer/test"), ("prj_dst", "/tmp")])
+#aaa = backup("learn_that", [("prj_src", "/source/learn_that"), ("prj_dst", "/mnt/learn_that")])
 #aaa.test("/home/lucifer/test")
 #aaa.snap_revert(0)
 #print aaa.prj_name
 #print aaa.prj_src
 #print aaa.prj_dst
-#aaa.snap_create("less tha as as asd")
+#aaa.snap_create("20130110")
 #aaa.snap_delete(0)
 #aaa.snap_rebase()
 #aaa.test(5)

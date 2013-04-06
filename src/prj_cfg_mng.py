@@ -44,6 +44,7 @@ class prj_cfg_parse(object):
         else:
             return (option, self.cfg.get(section, option))
 
+
     def value_modify(self, section, items):
         if self.cfg.has_section(section):
             result = []
@@ -102,11 +103,14 @@ if __name__ == "__main__":
 
 #EXAMPLE
 #aaa = prj_cfg()
-#print aaa.prjcfg_create("noexffffifst")
+#
+#if aaa.prjcfg_create("fffff"):
+#    aaa.prjcfg_edit("fffff", [("prj_src", '10000'), ("prj_dst", '123123')])
+
 #aaa.prjcfg_create("sectionB")
 #aaa.prjcfg_create("sectionA")
 #print aaa.prjcfg_edit("a", [("prj_dst", 123123)])
-#print aaa.prjcfg_edit("a", [("prj_src", 10000), ("prj_dst", 123123)])
+#aaa.prjcfg_edit("ffff", [("prj_src", '/home/lucifer/test'), ("prj_dst", '/tmp')])
 #aaa.prjcfg_read("dddd")
 ##aaa.prjcfg_list()
 #aaa.prjcfg_delete("sectionA")

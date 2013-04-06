@@ -33,3 +33,9 @@ def user_quit(anyinput):
     quit_cmp = re.compile("^quit$", re.I)
     if re.search(quit_cmp, str(anyinput)):
             return "quit"
+
+def prj_path_exist(items):
+    if os.path.exists(items[0][1]) and os.path.isdir(items[1][1]):
+        return True
+    else:
+        return None

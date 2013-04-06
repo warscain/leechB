@@ -1,9 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 *-*
 # leechB_bck
-# 1 dst dir： 暂放
-# 3 -l comments不完整BUG，有空格不行 重要。完成-t之后做
-#   -l 显示log里的时间
+# dst dir： 暂放
+# 
+# 
+# 1 S D 末尾有sep
+
 
 from optparse import OptionParser
 import sys
@@ -13,9 +15,11 @@ from src import prj_cfg_mng
 
 MSG_USAGE = "\nEXAMPLE:\n\
             leechB_bck -P prj_name -c -m 'comments you want'\n\
-            leechB_bck -P prj_name -d\n\
-            leechB_bck -P prj_name -d\n\
-            leechB_bck -P prj_name -l"
+            leechB_bck -P prj_name -d number\n\
+            leechB_bck -P prj_name -r number\n\
+            leechB_bck -P prj_name -i\n\
+            leechB_bck -P prj_name -l\n\
+            leechB_bck -P prj_name -t number -D /home/xxx/yyy"
 
 cmdhelp = OptionParser(MSG_USAGE)
 
@@ -32,42 +36,113 @@ cmdhelp.add_option('-D', '--destination', action='store', dest='destination', he
 (input_opts, args) = cmdhelp.parse_args(sys.argv[1:])
 prj_instance = prj_cfg_mng.prj_cfg()
 
+rul_create = input_opts.project and input_opts.create and input_opts.comment \
+                and not input_opts.delete \
+                and not input_opts.revert \
+                and not input_opts.rebase \
+                and not input_opts.bcklist \
+                and not input_opts.revertto \
+                and not input_opts.destination
+                
+
+rul_delete = input_opts.project and input_opts.delete != None \
+                and not input_opts.create \
+                and not input_opts.comment \
+                and not input_opts.revert \
+                and not input_opts.rebase \
+                and not input_opts.bcklist \
+                and not input_opts.revertto \
+                and not input_opts.destination
+
+rul_revert = input_opts.project and input_opts.revert != None \
+                and not input_opts.create \
+                and not input_opts.comment \
+                and not input_opts.delete \
+                and not input_opts.rebase \
+                and not input_opts.bcklist \
+                and not input_opts.revertto \
+                and not input_opts.destination
+
+rul_rebase = input_opts.project and input_opts.rebase \
+                and not input_opts.create \
+                and not input_opts.comment \
+                and not input_opts.delete \
+                and not input_opts.revert \
+                and not input_opts.bcklist \
+                and not input_opts.revertto \
+                and not input_opts.destination
+
+rul_bcklist = input_opts.project and input_opts.bcklist \
+                and not input_opts.create \
+                and not input_opts.comment \
+                and not input_opts.delete \
+                and not input_opts.revert \
+                and not input_opts.rebase \
+                and not input_opts.revertto \
+                and not input_opts.destination
+
+rul_revertto = input_opts.project and input_opts.revertto != None and input_opts.destination \
+                and not input_opts.create \
+                and not input_opts.comment \
+                and not input_opts.delete \
+                and not input_opts.revert \
+                and not input_opts.rebase \
+                and not input_opts.bcklist \
+                and not input_opts.destination
 
 # bck create
-if input_opts.project and input_opts.create and input_opts.comment:
+if rul_create:
     prj_read = prj_instance.prjcfg_read(input_opts.project)
-    bck_instance = backup.backup(input_opts.project, prj_read)
-    bck_instance.snap_create(input_opts.comment)
+    if prj_read:
+        bck_instance = backup.backup(input_opts.project, prj_read)
+        bck_instance.snap_create(input_opts.comment)
+    else:
+        print "No such section"
 
 # bck delete
-elif input_opts.project and input_opts.delete != None: #这里注意，因为revert可以为0 则input_opts.delete不为真
+elif rul_delete: #这里注意，因为revert可以为0 则input_opts.delete不为真
     prj_read = prj_instance.prjcfg_read(input_opts.project)
-    bck_instance = backup.backup(input_opts.project, prj_read)
-    bck_instance.snap_delete(input_opts.delete)
+    if prj_read:
+        bck_instance = backup.backup(input_opts.project, prj_read)
+        bck_instance.snap_delete(input_opts.delete)
+    else:
+        print "No such section"
 
 # bck revert
-elif input_opts.project and input_opts.revert != None: #这里注意，因为revert可以为0 则input_opts.revert不为真
+elif rul_revert: #这里注意，因为revert可以为0 则input_opts.revert不为真
     prj_read = prj_instance.prjcfg_read(input_opts.project)
-    bck_instance = backup.backup(input_opts.project, prj_read)
-    bck_instance.snap_revert(input_opts.revert)
+    if prj_read:
+        bck_instance = backup.backup(input_opts.project, prj_read)
+        bck_instance.snap_revert(input_opts.revert)
+    else:
+        print "No such section"
 
 # bck rebase
-elif input_opts.project and input_opts.rebase:
+elif rul_rebase:
     prj_read = prj_instance.prjcfg_read(input_opts.project)
-    bck_instance = backup.backup(input_opts.project, prj_read)
-    bck_instance.snap_rebase()
+    if prj_read:
+        bck_instance = backup.backup(input_opts.project, prj_read)
+        bck_instance.snap_rebase()
+    else:
+        print "No such section"
 
 # bck bcklist
-elif input_opts.project and input_opts.bcklist:
+elif rul_bcklist:
     prj_read = prj_instance.prjcfg_read(input_opts.project)
-    bck_instance = backup.backup(input_opts.project, prj_read)
-    bck_instance.snap_list()
+    if prj_read:
+        bck_instance = backup.backup(input_opts.project, prj_read)
+        bck_instance.snap_list()
+    else:
+        print "No such section"
 
 # bck revert to
-elif input_opts.project and input_opts.revertto != None and input_opts.destination:
+elif rul_revertto:
     prj_read = prj_instance.prjcfg_read(input_opts.project)
-    bck_instance = backup.backup(input_opts.project, prj_read)
-    bck_instance.snap_revert_to(input_opts.revertto, input_opts.destination)
+    if prj_read:
+        bck_instance = backup.backup(input_opts.project, prj_read)
+        bck_instance.snap_revert_to(input_opts.revertto, input_opts.destination)
+    else:
+        print "No such section"
 
 else:
     print 'Wrong way to use, pls get help from "-h"'
